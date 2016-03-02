@@ -1,0 +1,14 @@
+package:
+  name: mx
+  version: 0.1
+
+build:
+  number: 0
+
+test:
+  commands:
+      - mx help
+
+about:
+  license: Apache License
+  license_file: LICENSE

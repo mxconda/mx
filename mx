@@ -1,0 +1,44 @@
+#!/bin/bash
+
+if [[ "${BASH_SOURCE[0]}" != "${0}" ]]; then
+    echo "This script is not meant to be sourced."
+    return
+fi
+
+# it must work even if this file is called through nested symlinks
+_this_file="$0"
+while [ -h "$_this_file" ]; do
+    _this_dir="$( cd -P "$( dirname "$_this_file" )" && pwd )"
+    _this_file="$(readlink "$_this_file")"
+    [[ $_this_file != /* ]] && _this_file="$_this_dir/$_this_file"
+done
+_this_dir=$(cd "$(dirname "$_this_file")" 2>/dev/null; pwd)
+_bin_dirs="$_this_dir:$(dirname $_this_dir)/cctbx/build/bin"
+
+if [ -z "$1" ]; then
+    echo -e "\033[1;36mMXconda bash subshell.\033[0;36m Ctrl-D to exit.\033[0m"
+    exec bash --rcfile \
+        <(echo '. $HOME/.bashrc 2>/dev/null'
+          echo 'PS1="\033[0;36mmx\033[0m $PS1";'
+          echo PATH=$_bin_dirs:'$PATH') \
+        -i
+else
+    case "$1" in
+    install|remove|uninstall|update|upgrade|clean|info|search|list|config)
+        exec "$_this_dir"/conda "$@"
+        ;;
+    help|-h|--help)
+        cat <<EOF
+mx is a simple launcher script. If the first argument is one of:
+install, remove, update, clean, info, search, list, config
+then the package manager (conda) is run. Type "mx conda -h" for details.
+With other arguments - the specified command is run.
+With no arguments - new bash shell is started with MXconda in the PATH.
+EOF
+        ;;
+    *)
+        PATH="$bin_dirs:$PATH"
+        exec "$@"
+        ;;
+    esac
+fi
