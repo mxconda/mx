@@ -17,10 +17,23 @@ _bin_dirs="$_this_dir:$(dirname $_this_dir)/cctbx/build/bin"
 
 if [ -z "$1" ]; then
     echo -e "\033[1;36mMXconda bash subshell.\033[0;36m Ctrl-D to exit.\033[0m"
+    # On Mac bash in a new terminal window is a login shell, but not on Linux.
+    # Thus different sets of init files are executed.
+    # mx starts interactive, non-login shell. The easiest way to pass startup
+    # commands to this shell is through --rcfile (the actual rcfile ~/.bashrc
+    # is then sourced manually). But one problem remains on Mac.
+    # A bash subshell started on vanilla OSX does not set things useful
+    # for interactive shell such as PS1 and checkwinsize.
+    # All these files can be customized and we cannot be sure of the content,
+    # but as a simple heuristic: if PS1 has default value (\s-\v\$ ) we try
+    # to manually source /etc/bashrc on Mac. It is not one of the files that
+    # bash knows about - but it happens to have useful stuff.
+
     exec bash --rcfile \
-        <(echo '. $HOME/.bashrc 2>/dev/null'
-          echo 'PS1="\033[0;36mmx\033[0m $PS1";'
-          echo PATH=$_bin_dirs:'$PATH') \
+        <(echo '[ -r $HOME/.bashrc ] && . $HOME/.bashrc
+	        [ "$PS1" = "\\s-\\v\\$ " -a -r /etc/bashrc ] && . /etc/bashrc
+                PS1="\033[0;36m(mx)\033[0m$PS1"
+                PATH='"$_bin_dirs"':$PATH') \
         -i
 else
     case "$1" in
