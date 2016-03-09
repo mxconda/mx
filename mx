@@ -16,6 +16,8 @@ _this_dir=$(cd "$(dirname "$_this_file")" 2>/dev/null; pwd)
 _cctbx_bin="$(dirname $_this_dir)/cctbx/build/bin"
 _bin_dirs="$_this_dir:$_cctbx_bin"
 
+export CONDARC="$(dirname "$_this_file")"/.condarc
+
 # no args -> start subshell
 if [ "$#" = 0 ]; then
     echo -e "\033[1;36mMXconda bash subshell.\033[0;36m Ctrl-D to exit.\033[0m"
