@@ -36,7 +36,7 @@ if [ "$#" = 0 ]; then
     exec bash --rcfile \
         <(echo '[ -r $HOME/.bashrc ] && . $HOME/.bashrc
 	        [ "$PS1" = "\\s-\\v\\$ " -a -r /etc/bashrc ] && . /etc/bashrc
-                PS1="\033[0;36m(mx)\033[0m$PS1"
+                PS1="\[\e[0;36m\](mx)\[\e[m\]$PS1"
                 PATH='"$_bin_dirs"':$PATH') \
         -i
 fi
